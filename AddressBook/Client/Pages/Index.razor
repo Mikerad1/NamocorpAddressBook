@@ -1,7 +1,35 @@
 ﻿@page "/"
+@inject HttpClient http
+@inject NavigationManager navigationManager
 
-<h1>Hello, world!</h1>
+<div class="container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col"><h1 class="h1">Address Book</h1></div>
+        <div class="col"></div>
+    </div>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <MatTable Items="@contacts" class="mat-elevation-z5">
+                <MatTableHeader>
+                    <th>First Name</th>
+                    <th>Surname</th>
+                    <th>Birth Date</th>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.FirstName</td>
+                    <td>@context.Surname</td>
+                    <td>@context.BirthDate</td>
+                </MatTableRow>
+            </MatTable>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+@code{
+    List<Contact> contacts = new List<Contact>();
 
-Welcome to your new app.
+    override 
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+}
