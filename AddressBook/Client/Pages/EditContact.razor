@@ -21,14 +21,14 @@
                     </MatButton>
                 </div>
             </div>
-            <div class="row mb-2">
+            <div class="row mb-2" hidden="@(selectedContactDetail == null)">
                 <div class="col">
                     <MatButton OnClick="EditContactDetail" Label="Edit Contact Detail" Raised="true">
                         <i class="fas fa-pencil" aria-hidden="true"></i>
                     </MatButton>
                 </div>
             </div>
-            <div class="row mb-2">
+            <div class="row mb-2" hidden="@(selectedContactDetail == null)">
                 <div class="col">
                     <MatButton OnClick="RemoveContactDetail" Label="Remove Contact Detail" Raised="true">
                         <i class="fas fa-pencil" aria-hidden="true"></i>
@@ -40,7 +40,7 @@
     <div class="row">
         <div class="col"></div>
         <div class="col">
-            <MatTable Items="@conContact.ContactDetails" class="mat-elevation-z5">
+            <MatTable Items="@conContact.ContactDetails" class="mat-elevation-z5" SelectionChanged="SelectionChangedEvent">
                 <MatTableHeader>
                     <th>Description</th>
                     <th>Contact Type</th>
@@ -54,11 +54,50 @@
         <div class="col"></div>
     </div>
 </div>
+<MatDialog @bind-IsOpen="@dialogIsOpen">
+    <MatDialogTitle>Add Contact Detail</MatDialogTitle>
+    <MatDialogContent>
+        <p>What's your favorite animal?</p>
+        <MatSelect @bind-Value="@contactDetailCreation.ContactTypeId" TValue="ContactType" Label="Contact Type">
+            <MatOption Value="0">Address</MatOption>
+            <MatOption Value="1">Telephone</MatOption>
+            <MatOption Value="2">Cell</MatOption>
+            <MatOption Value="3">Email</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="@contactDetailCreation.Description"></MatTextField>
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@(e => { dialogIsOpen = false; })">No Thanks</MatButton>
+        <MatButton OnClick="@OkClick">Create</MatButton>
+    </MatDialogActions>
+</MatDialog>
+<MatDialog @bind-IsOpen="@editDialogIsOpen">
+    <MatDialogTitle>Add Contact Detail</MatDialogTitle>
+    <MatDialogContent>
+        <p>What's your favorite animal?</p>
+        <MatSelect @bind-Value="@selectedContactDetail.ContactTypeId" TValue="ContactType" Label="Contact Type">
+            <MatOption Value="0">Address</MatOption>
+            <MatOption Value="1">Telephone</MatOption>
+            <MatOption Value="2">Cell</MatOption>
+            <MatOption Value="3">Email</MatOption>
+        </MatSelect>
+        <MatTextField @bind-Value="@selectedContactDetail.Description"></MatTextField>
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@(e => { editDialogIsOpen = false; })">No Thanks</MatButton>
+        <MatButton OnClick="@OkClick">Create</MatButton>
+    </MatDialogActions>
+</MatDialog>
 
 @code {
 
     [Parameter]
     public string Contact { get; set; }
+    bool dialogIsOpen = false;
+    bool editDialogIsOpen = false;
+
+    ContactDetail contactDetailCreation = new ContactDetail();
+    ContactDetail selectedContactDetail;
 
     public Contact conContact;
     protected override void OnInitialized()
@@ -66,4 +105,41 @@
         conContact = JsonSerializer.Deserialize<Contact>(Contact);
         
     }
+    public void AddContactDetail(){
+        dialogIsOpen = true;
+    }
+    public void SelectionChangedEvent(object contact){
+        selectedContactDetail= (ContactDetail)contact;
+    }
+    public async void RemoveContactDetail(){
+        var response = await http.DeleteAsync($"ContactDetail/{selectedContactDetail.ContactDetailId}");
+        if(response.IsSuccessStatusCode){
+            conContact.ContactDetails.Remove(selectedContactDetail);
+            StateHasChanged();
+        }
+    }
+    public async void OkClick() {
+        conContact.ContactDetails.Add(contactDetailCreation);
+        string json = JsonSerializer.Serialize<Contact>(conContact);
+        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await http.PostAsJsonAsync("ContactDetail", json);
+        if (response.IsSuccessStatusCode)
+        {
+            string stringResponse = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(stringResponse))
+            {
+                contactDetailCreation = new ContactDetail();
+                dialogIsOpen = false;
+                StateHasChanged();
+            }
+        }
+    }
+    public void Back() {
+        navigationManager.NavigateTo("");
+    }
+    public void EditContactDetail(){
+        dialogIsOpen = true;
+    }
+
+    
 }
