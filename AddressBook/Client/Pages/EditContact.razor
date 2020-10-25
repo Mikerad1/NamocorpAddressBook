@@ -1,0 +1,69 @@
+@page "/EditContact/{Contact}"
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<div class="container">
+    <div class="row mb-2">
+        <div class="col"></div>
+        <div class="col"><h1 class="h1">Address Book</h1></div>
+        <div class="col">
+            <div class="row mb-2">
+                <div class="col">
+                    <MatButton OnClick="Back" Label="Add Contact Detail" Raised="true">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <MatButton OnClick="AddContactDetail" Label="Add Contact Detail" Raised="true">
+                        <i class="fas fa-pencil" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <MatButton OnClick="EditContactDetail" Label="Edit Contact Detail" Raised="true">
+                        <i class="fas fa-pencil" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <div class="col">
+                    <MatButton OnClick="RemoveContactDetail" Label="Remove Contact Detail" Raised="true">
+                        <i class="fas fa-pencil" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <MatTable Items="@conContact.ContactDetails" class="mat-elevation-z5">
+                <MatTableHeader>
+                    <th>Description</th>
+                    <th>Contact Type</th>
+                </MatTableHeader>
+                <MatTableRow>
+                    <td>@context.Description</td>
+                    <td>@context.ContactTypeId</td>
+                </MatTableRow>
+            </MatTable>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Contact { get; set; }
+
+    public Contact conContact;
+    protected override void OnInitialized()
+    {
+        conContact = JsonSerializer.Deserialize<Contact>(Contact);
+        
+    }
+}

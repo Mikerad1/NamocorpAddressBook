@@ -27,12 +27,24 @@ namespace AddressBook.Server.Controllers {
             try
             {
                 _db.Contacts.Add(contact);
+                _db.SaveChanges();
                 return Ok();
             }
             catch (Exception)
             {
                 return Ok("An error occured while adding contact to the database");
             }
+        }
+
+        [HttpDelete]
+        public void Delete(int id){
+            Contact contextContact = _db.Contacts.Find(id);
+            foreach (ContactDetail detail in contextContact.ContactDetails)
+            {
+                contextContact.ContactDetails.Remove(detail);
+            }
+            _db.Contacts.Remove(contextContact);
+            _db.SaveChanges();
         }
     }
 }

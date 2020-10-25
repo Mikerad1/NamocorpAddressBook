@@ -7,15 +7,33 @@
         <div class="col"></div>
         <div class="col"><h1 class="h1">Address Book</h1></div>
         <div class="col">
-            <MatButton OnClick="AddContact" Label="Add Contact" Raised="true">
-                <i class="fas fa-plus" aria-hidden="true"></i>
-            </MatButton>
+            <div class="row mb-2">
+                <div class="col">
+                    <MatButton OnClick="AddContact" Label="Add Contact" Raised="true">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
+            <div class="row mb-2" hidden="@(selectedContact == null)">
+                <div class="col">
+                    <MatButton OnClick="EditContact" Label="Edit Contact" Raised="true">
+                        <i class="fas fa-pencil" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
+            <div class="row mb-2" hidden="@(selectedContact == null)">
+                <div class="col">
+                    <MatButton OnClick="RemoveContact" Label="Remove Contact" Raised="true">
+                        <i class="fas fa-pencil" aria-hidden="true"></i>
+                    </MatButton>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col"></div>
         <div class="col">
-            <MatTable Items="@contacts" class="mat-elevation-z5">
+            <MatTable Items="@contacts" class="mat-elevation-z5" SelectionChanged="SelectionChangedEvent">
                 <MatTableHeader>
                     <th>First Name</th>
                     <th>Surname</th>
@@ -33,6 +51,7 @@
 </div>
 @code {
     List<Contact> contacts = new List<Contact>();
+    Contact selectedContact;
 
     protected override async void OnInitialized()
     {
@@ -42,6 +61,21 @@
 
     public void AddContact() {
         navigationManager.NavigateTo("AddContact");
+    }
+    public void EditContact() {
+        navigationManager.NavigateTo("EditContact");
+    }
+    public async void RemoveContact(){
+        var response = await http.DeleteAsync($"AddressBook/Delete/{selectedContact.ContactId}");
+        if(response.IsSuccessStatusCode){
+            Contact[] tempContacts = await http.GetFromJsonAsync<Contact[]>("AddressBook");
+            contacts = tempContacts.ToList();
+            StateHasChanged();
+        }
+    }
+
+    public void SelectionChangedEvent(Contact contact){
+        selectedContact = contact;
     }
 
 

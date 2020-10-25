@@ -13,6 +13,6 @@ namespace AddressBook.Shared.Model {
         [Required]
         public DateTime BirthDate { get; set; }
         public DateTime UpdatedDate { get; set; }
-        List<ContactDetail> ContactDetails { get; set; }
+        public List<ContactDetail> ContactDetails { get; set; }
     }
 }
