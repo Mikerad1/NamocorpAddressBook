@@ -1,0 +1,77 @@
+@page "/AddContact"
+@inject HttpClient http
+@inject NavigationManager navigationManager
+@inject IMatToaster Toaster
+
+
+<div class="container">
+    <div class="row mb-2">
+        <div class="col"></div>
+        <div class="col"><h1 class="h1">Address Book</h1></div>
+        <div class="col">
+            <MatButton Label="Back" OnClick="Back" Raised="true">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+            </MatButton>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <EditForm Model="@contact" OnValidSubmit="Submit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <p>
+                    <MatStringField @bind-Value="@contact.FirstName" Label="First Name"></MatStringField>
+                </p>
+                <p>
+                    <MatStringField @bind-Value="@contact.Surname" Label="Surname"></MatStringField>
+                </p>
+                <p>
+                    <MatDatePicker @bind-Value="@contact.BirthDate" Label="Birth Date" Format="yyyy-MM-dd"></MatDatePicker>
+                </p>
+                <p>
+                    <MatButton Label="Submit"></MatButton>
+                </p>
+            </EditForm>
+        </div>
+        <div class="col"></div>
+    </div>
+</div>
+
+
+@code {
+    Contact contact = new Contact();
+    
+    public async void Submit(){
+        contact.UpdatedDate = DateTime.Now;
+        string request = JsonSerializer.Serialize<Contact>(contact);
+        HttpContent content = new StringContent(request, Encoding.UTF8, "application/json");
+        try
+        {
+            var response = await http.PostAsJsonAsync($"{navigationManager.BaseUri}AddressBook", content);
+            if(response.IsSuccessStatusCode) {
+                string stringResponse = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrEmpty(stringResponse))
+                {
+                    Toaster.Add($"Contact '{contact.FirstName} {contact.Surname}' was successfully added",MatToastType.Success);
+                    navigationManager.NavigateTo("");
+                }
+                else 
+                {
+                    Toaster.Add($"Could not add contact for reason '{stringResponse}'", MatToastType.Danger);
+                }
+            }
+            else
+            {
+                Toaster.Add($"Could not add contact for reason '{await response.Content.ReadAsStringAsync()}'", MatToastType.Danger);
+            }
+        }
+        catch (Exception)
+        {
+            Toaster.Add($"An unexplained error occured while adding contact '{contact.FirstName} {contact.Surname}'", MatToastType.Danger);
+        }
+    }
+    public void Back() {
+        navigationManager.NavigateTo("");
+    }
+}

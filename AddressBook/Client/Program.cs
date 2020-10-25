@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MatBlazor;
 
 namespace AddressBook.Client {
     public class Program {
@@ -22,6 +23,15 @@ namespace AddressBook.Client {
             builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("AddressBook.ServerAPI"));
 
             builder.Services.AddApiAuthorization();
+            builder.Services.AddMatToaster(config =>
+            {
+                config.Position = MatToastPosition.TopRight;
+                config.PreventDuplicates = true;
+                config.NewestOnTop = true;
+                config.ShowCloseButton = true;
+                config.MaximumOpacity = 95;
+                config.VisibleStateDuration = 3000;
+            });
 
             await builder.Build().RunAsync();
         }

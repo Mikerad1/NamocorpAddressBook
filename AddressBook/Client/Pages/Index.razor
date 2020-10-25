@@ -3,10 +3,14 @@
 @inject NavigationManager navigationManager
 
 <div class="container">
-    <div class="row">
+    <div class="row mb-2">
         <div class="col"></div>
         <div class="col"><h1 class="h1">Address Book</h1></div>
-        <div class="col"></div>
+        <div class="col">
+            <MatButton OnClick="AddContact" Label="Add Contact" Raised="true">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+            </MatButton>
+        </div>
     </div>
     <div class="row">
         <div class="col"></div>
@@ -27,9 +31,18 @@
         <div class="col"></div>
     </div>
 </div>
-@code{
+@code {
     List<Contact> contacts = new List<Contact>();
 
-    override 
+    protected override async void OnInitialized()
+    {
+        Contact[] tempContacts = await http.GetFromJsonAsync<Contact[]>("AddressBook");
+        contacts = tempContacts.ToList();
+    }
+
+    public void AddContact() {
+        navigationManager.NavigateTo("AddContact");
+    }
+
 
 }

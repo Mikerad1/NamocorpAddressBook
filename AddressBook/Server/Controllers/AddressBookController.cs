@@ -21,5 +21,18 @@ namespace AddressBook.Server.Controllers {
         public IEnumerable<Contact> Get() {
             return _db.Contacts;
         }
+
+        [HttpPost]
+        public IActionResult Post([FromBody] Contact contact){
+            try
+            {
+                _db.Contacts.Add(contact);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return Ok("An error occured while adding contact to the database");
+            }
+        }
     }
 }
