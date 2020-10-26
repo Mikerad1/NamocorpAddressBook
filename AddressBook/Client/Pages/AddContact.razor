@@ -45,10 +45,11 @@
     public async void Submit(){
         contact.UpdatedDate = DateTime.Now;
         string request = JsonSerializer.Serialize<Contact>(contact);
-        HttpContent content = new StringContent(request, Encoding.UTF8, "application/json");
+        var content = new StringContent(request, Encoding.UTF8, "application/json");
         try
         {
-            var response = await http.PostAsJsonAsync($"{navigationManager.BaseUri}AddressBook", content);
+            string url = $"{navigationManager.BaseUri}AddressBook";
+            var response = await http.PostAsync(url, content);
             if(response.IsSuccessStatusCode) {
                 string stringResponse = await response.Content.ReadAsStringAsync();
                 if (string.IsNullOrEmpty(stringResponse))
@@ -66,9 +67,9 @@
                 Toaster.Add($"Could not add contact for reason '{await response.Content.ReadAsStringAsync()}'", MatToastType.Danger);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Toaster.Add($"An unexplained error occured while adding contact '{contact.FirstName} {contact.Surname}'", MatToastType.Danger);
+            Toaster.Add($"An unexplained error occured while adding contact '{contact.FirstName} {contact.Surname}'. Error is {ex.Message}", MatToastType.Danger);
         }
     }
     public void Back() {

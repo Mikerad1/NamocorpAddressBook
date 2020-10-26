@@ -63,7 +63,8 @@
         navigationManager.NavigateTo("AddContact");
     }
     public void EditContact() {
-        navigationManager.NavigateTo("EditContact");
+        string b64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(selectedContact)));
+        navigationManager.NavigateTo($"EditContact/{b64}");
     }
     public async void RemoveContact(){
         var response = await http.DeleteAsync($"AddressBook/Delete/{selectedContact.ContactId}");

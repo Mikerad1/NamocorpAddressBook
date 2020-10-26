@@ -1,4 +1,4 @@
-@page "/EditContact/{Contact}"
+@page "/EditContact/{contact}"
 @inject HttpClient http
 @inject NavigationManager navigationManager
 
@@ -91,18 +91,21 @@
 
 @code {
 
-    [Parameter]
-    public string Contact { get; set; }
-    bool dialogIsOpen = false;
-    bool editDialogIsOpen = false;
+		[Parameter]
+		public string contact { get; set; }
+		bool dialogIsOpen = false;
+		bool editDialogIsOpen = false;
 
-    ContactDetail contactDetailCreation = new ContactDetail();
-    ContactDetail selectedContactDetail;
+		ContactDetail contactDetailCreation = new ContactDetail();
+		ContactDetail selectedContactDetail;
 
-    public Contact conContact;
-    protected override void OnInitialized()
-    {
-        conContact = JsonSerializer.Deserialize<Contact>(Contact);
+
+	public Contact conContact;
+	protected override void OnInitialized()
+	{
+		string json = Encoding.UTF8.GetString(Convert.FromBase64String(contact));
+
+		conContact = JsonSerializer.Deserialize<Contact>(json);
         
     }
     public void AddContactDetail(){
@@ -112,7 +115,7 @@
         selectedContactDetail= (ContactDetail)contact;
     }
     public async void RemoveContactDetail(){
-        var response = await http.DeleteAsync($"ContactDetail/{selectedContactDetail.ContactDetailId}");
+        var response = await http.DeleteAsync($"ContactDetails/{selectedContactDetail.ContactDetailId}");
         if(response.IsSuccessStatusCode){
             conContact.ContactDetails.Remove(selectedContactDetail);
             StateHasChanged();
@@ -122,7 +125,7 @@
         conContact.ContactDetails.Add(contactDetailCreation);
         string json = JsonSerializer.Serialize<Contact>(conContact);
         HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await http.PostAsJsonAsync("ContactDetail", json);
+        var response = await http.PostAsJsonAsync("ContactDetails", json);
         if (response.IsSuccessStatusCode)
         {
             string stringResponse = await response.Content.ReadAsStringAsync();
